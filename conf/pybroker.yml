@@ -1,0 +1,20 @@
+---
+input:
+    drivers: 'bbdo'
+    workers: 1
+    zmq_url: "inproc://broker_input"
+    driver_options:
+        wait_socket: 10
+output:
+    drivers: 'celery_tasks'
+    workers: 5
+    zmq_url: "inproc://broker_output"
+    driver_options:
+        tasks:
+            - 'es'
+admin:
+    zmq_url: "inproc://admin"
+state:
+    zmq_url: "inproc://state"
+admin_inside:
+    zmq_url: "inproc://admin_inside"
