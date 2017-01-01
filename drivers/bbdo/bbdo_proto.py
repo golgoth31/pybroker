@@ -22,13 +22,16 @@ from struct import *
 import yaml
 import json
 import logging
+from PyCRC.CRCCCITT import CRCCCITT
+from PyCRC.CRC16 import CRC16
 
 
 class Bbdo_proto():
 
-    def __init__(self, logger):
+    def __init__(self, logger, options):
         # Load bbdo matrix definition
-        with open("conf/bbdo_proto.yml", 'r') as stream:
+        self.options = options
+        with open("conf/bbdo_proto_v"+str(self.options['version'])+".yml", 'r') as stream:
             try:
                 self.bbdo_matrix = yaml.safe_load(stream)
             except yaml.YAMLError as exc:
@@ -40,7 +43,15 @@ class Bbdo_proto():
         if len(data) > self.head_size:
             print('not a valid header')
             exit()
+        # TODO: add check for bbdo protocol version
+        # if header 8 bytes => v1
+        # if header 16 bytes => v2
+
+        # 8 bytes
         self.checksum, self.stream_size, event_id = unpack_from(
+            self.bbdo_matrix['header']['fmt'], data)
+        # 16 bytes
+        self.checksum, self.stream_size, event_id, self.source_id, self.destination_id = unpack_from(
             self.bbdo_matrix['header']['fmt'], data)
         self.event_cat = event_id / 65536
         self.event_type = event_id - (self.event_cat * 65536)
@@ -51,9 +62,12 @@ class Bbdo_proto():
         # print('event cat: ' + str(self.event_cat))
         # print('event type: ' + str(self.event_type))
         try:
-            local_event = self.bbdo_matrix['events'][self.event_cat][self.event_type]['fields']
+            local_event = self.bbdo_matrix['events'][
+                self.event_cat][self.event_type]['fields']
             self.event_type_name = self.bbdo_matrix['events'][
-            self.event_cat][self.event_type]['name']
+                self.event_cat][self.event_type]['name']
+            self.logger.debug("event cat => "+str(self.event_cat))
+            self.logger.debug("event type => "+str(self.event_type)+"("+self.event_type_name+")")
             output['bbdo_state'] = 'ok'
             for field in local_event:
                 output[local_event[field]['name']] = ""

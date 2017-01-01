@@ -1,0 +1,2008 @@
+---
+version:
+  major: 2
+  minor: 0
+  patch: 0
+header:
+    fmt: '>HHIII'
+events:
+    1:
+        name: NEB
+        api: BBDO_NEB_TYPE
+        1:
+          name: acknowledgement
+          fields:
+            1:
+              name: acknowledgement_type
+              type: h
+            2:
+              name: author
+              type: s
+            3:
+              name: comment
+              type: s
+            4:
+              name: deletion_time
+              type: q
+            5:
+              name: entry_time
+              type: q
+            6:
+              name: host_id
+              type: I
+            7:
+              name: instance_id
+              type: I
+            8:
+              name: is_sticky
+              type: '?'
+            9:
+              name: notify_contacts
+              type: '?'
+            10:
+              name: persistent_comment
+              type: '?'
+            11:
+              name: service_id
+              type: I
+            12:
+              name: state
+              type: h
+            13:
+              name: notify_only_if_not_already_acknowledged
+              type: '?'
+        2:
+          name: comment
+          fields:
+            1:
+              name: author
+              type: s
+            2:
+              name: comment_type
+              type: h
+            3:
+              name: deletion_time
+              type: q
+            4:
+              name: entry_time
+              type: q
+            5:
+              name: entry_type
+              type: h
+            6:
+              name: expire_time
+              type: q
+            7:
+              name: expires
+              type: '?'
+            8:
+              name: host_id
+              type: I
+            9:
+              name: instance_id
+              type: I
+            10:
+              name: internal_id
+              type: I
+            11:
+              name: persistent
+              type: '?'
+            12:
+              name: service_id
+              type: I
+            13:
+              name: source
+              type: h
+            14:
+              name: data
+              type: s
+        3:
+          name: custom_variable
+          fields:
+            1:
+              name: enabled
+              type: '?'
+            2:
+              name: host_id
+              type: I
+            3:
+              name: modified
+              type: '?'
+            4:
+              name: name
+              type: s
+            5:
+              name: service_id
+              type: I
+            6:
+              name: update_time
+              type: q
+            7:
+              name: var_type
+              type: h
+            8:
+              name: value
+              type: s
+            9:
+              name: default_value
+              type: s
+        4:
+          name: custom_variable_status
+          fields:
+            1:
+              name: host_id
+              type: I
+            2:
+              name: modified
+              type: '?'
+            3:
+              name: name
+              type: s
+            4:
+              name: service_id
+              type: I
+            5:
+              name: update_time
+              type: q
+            6:
+              name: value
+              type: s
+        5:
+          name: downtime
+          fields:
+            1:
+              name: actual_end_time
+              type: q
+            2:
+              name: actual_start_time
+              type: q
+            3:
+              name: author
+              type: s
+            4:
+              name: downtime_type
+              type: h
+            5:
+              name: deletion_time
+              type: q
+            6:
+              name: duration
+              type: q
+            7:
+              name: end_time
+              type: q
+            8:
+              name: entry_time
+              type: q
+            9:
+              name: fixed
+              type: '?'
+            10:
+              name: host_id
+              type: I
+            11:
+              name: instance_id
+              type: I
+            12:
+              name: internal_id
+              type: I
+            13:
+              name: service_id
+              type: I
+            14:
+              name: start_time
+              type: q
+            15:
+              name: triggered_by
+              type: I
+            16:
+              name: was_cancelled
+              type: '?'
+            17:
+              name: was_started
+              type: '?'
+            18:
+              name: comment
+              type: s
+            19:
+              name: is_recurring
+              type: '?'
+            20:
+              name: recurring_tp
+              type: s
+            21:
+              name: come_from
+              type: h
+        6:
+          name: event_handler
+          fields:
+            1:
+              name: early_timeout
+              type: '?'
+            2:
+              name: end_time
+              type: q
+            3:
+              name: execution_time
+              type: s
+            4:
+              name: handler_type
+              type: h
+            5:
+              name: host_id
+              type: I
+            6:
+              name: return_code
+              type: h
+            7:
+              name: service_id
+              type: I
+            8:
+              name: start_time
+              type: q
+            9:
+              name: state
+              type: h
+            10:
+              name: state_type
+              type: h
+            11:
+              name: timeout
+              type: h
+            12:
+              name: command_args
+              type: s
+            13:
+              name: command_line
+              type: s
+            14:
+              name: output
+              type: s
+            15:
+              name: source_id
+              type: I
+            16:
+              name: destination_id
+              type: I
+        7:
+          name: flapping_status
+          fields:
+            1:
+              name: comment_time
+              type: q
+            2:
+              name: event_time
+              type: q
+            3:
+              name: event_type
+              type: I
+            4:
+              name: flapping_type
+              type: h
+            5:
+              name: high_threshold
+              type: s
+            6:
+              name: host_id
+              type: I
+            7:
+              name: internal_comment_id
+              type: I
+            8:
+              name: low_threshold
+              type: s
+            9:
+              name: percent_state_change
+              type: s
+            10:
+              name: reason_type
+              type: h
+            11:
+              name: service_id
+              type: I
+        8:
+          name: host_check
+          fields:
+            1:
+              name: active_checks_enabled
+              type: '?'
+            2:
+              name: check_type
+              type: h
+            3:
+              name: host_id
+              type: I
+            4:
+              name: next_check
+              type: q
+            5:
+              name: command_line
+              type: s
+            # 6:
+            #   name: source_id
+            #   type: I
+            # 7:
+            #   name: destination_id
+            #   type: I
+        9:
+          name: host_dependency
+          fields:
+            1:
+              name: dependency_period
+              type: s
+            2:
+              name: dependent_host_id
+              type: I
+            3:
+              name: enabled
+              type: '?'
+            4:
+              name: execution_failure_options
+              type: s
+            5:
+              name: inherits_parent
+              type: '?'
+            6:
+              name: host_id
+              type: I
+            7:
+              name: notification_failure_options
+              type: s
+        10:
+          name: host_group
+          fields:
+            1:
+              name: enabled
+              type: '?'
+            2:
+              name: instance_id
+              type: I
+            3:
+              name: name
+              type: s
+            4:
+              name: group_id
+              type: I
+        11:
+          name: host_group_member
+          fields:
+            1:
+              name: enabled
+              type: '?'
+            2:
+              name: group
+              type: s
+            3:
+              name: instance_id
+              type: I
+            4:
+              name: host_id
+              type: I
+            5:
+              name: source_id
+              type: I
+            6:
+              name: destination_id
+              type: I
+        12:
+          name: host
+          fields:
+            1:
+              name: acknowledged
+              type: '?'
+            2:
+              name: acknowledgement_type
+              type: h
+            3:
+              name: action_url
+              type: s
+            4:
+              name: active_checks_enabled
+              type: '?'
+            5:
+              name: address
+              type: s
+            6:
+              name: alias
+              type: s
+            7:
+              name: check_freshness
+              type: '?'
+            8:
+              name: check_interval
+              type: s
+            9:
+              name: check_period
+              type: s
+            10:
+              name: check_type
+              type: h
+            11:
+              name: current_check_attempt
+              type: h
+            12:
+              name: current_state
+              type: h
+            13:
+              name: default_active_checks_enabled
+              type: '?'
+            14:
+              name: default_event_handler_enabled
+              type: '?'
+            16:
+              name: default_flap_detection_enabled
+              type: '?'
+            17:
+              name: default_notifications_enabled
+              type: '?'
+            18:
+              name: default_passive_checks_enabled
+              type: '?'
+            20:
+              name: display_name
+              type: s
+            21:
+              name: enabled
+              type: '?'
+            22:
+              name: event_handler
+              type: s
+            23:
+              name: event_handler_enabled
+              type: '?'
+            24:
+              name: execution_time
+              type: s
+            25:
+              name: first_notification_delay
+              type: s
+            26:
+              name: flap_detection_enabled
+              type: '?'
+            27:
+              name: flap_detection_on_down
+              type: '?'
+            28:
+              name: flap_detection_on_unreachable
+              type: '?'
+            29:
+              name: flap_detection_on_up
+              type: '?'
+            30:
+              name: freshness_threshold
+              type: s
+            31:
+              name: has_been_checked
+              type: '?'
+            32:
+              name: high_flap_threshold
+              type: s
+            33:
+              name: host_name
+              type: s
+            34:
+              name: host_id
+              type: I
+            35:
+              name: icon_image
+              type: s
+            36:
+              name: icon_image_alt
+              type: s
+            37:
+              name: instance_id
+              type: I
+            38:
+              name: is_flapping
+              type: '?'
+            39:
+              name: last_check
+              type: q
+            40:
+              name: last_hard_state
+              type: h
+            41:
+              name: last_hard_state_change
+              type: q
+            42:
+              name: last_notification
+              type: q
+            43:
+              name: last_state_change
+              type: q
+            44:
+              name: last_time_down
+              type: q
+            45:
+              name: last_time_unreachable
+              type: q
+            46:
+              name: last_time_up
+              type: q
+            47:
+              name: last_update
+              type: q
+            48:
+              name: latency
+              type: s
+            49:
+              name: low_flap_threshold
+              type: s
+            50:
+              name: max_check_attempts
+              type: h
+            51:
+              name: next_check
+              type: q
+            52:
+              name: next_notification
+              type: q
+            53:
+              name: no_more_notifications
+              type: '?'
+            54:
+              name: notes
+              type: s
+            55:
+              name: notes_url
+              type: s
+            56:
+              name: notification_interval
+              type: s
+            57:
+              name: notification_number
+              type: h
+            58:
+              name: notification_period
+              type: s
+            59:
+              name: notifications_enabled
+              type: '?'
+            60:
+              name: notify_on_down
+              type: '?'
+            61:
+              name: notify_on_downtime
+              type: '?'
+            62:
+              name: notify_on_flapping
+              type: '?'
+            63:
+              name: notify_on_recovery
+              type: '?'
+            64:
+              name: notify_on_unreachable
+              type: '?'
+            65:
+              name: obsess_over
+              type: '?'
+            66:
+              name: passive_checks_enabled
+              type: '?'
+            67:
+              name: percent_state_change
+              type: s
+            68:
+              name: retry_interval
+              type: s
+            69:
+              name: scheduled_downtime_depth
+              type: h
+            70:
+              name: should_be_scheduled
+              type: '?'
+            71:
+              name: stalk_on_down
+              type: '?'
+            72:
+              name: stalk_on_unreachable
+              type: '?'
+            73:
+              name: stalk_on_up
+              type: '?'
+            74:
+              name: statusmap_image
+              type: s
+            75:
+              name: state_type
+              type: h
+            76:
+              name: check_command
+              type: s
+            77:
+              name: output
+              type: s
+            78:
+              name: perf_data
+              type: s
+            79:
+              name: retain_nonstatus_information
+              type: '?'
+            80:
+              name: retain_status_information
+              type: '?'
+            81:
+              name: timezone
+              type: s
+        13:
+          name: host_parent
+          fields:
+            1:
+              name: enabled
+              type: '?'
+            2:
+              name: child_id
+              type: I
+            3:
+              name: parent_id
+              type: I
+        14:
+          name: host_status
+          fields:
+            1:
+              name: acknowledged
+              type: '?'
+            2:
+              name: acknowledgement_type
+              type: h
+            3:
+              name: active_checks_enabled
+              type: '?'
+            4:
+              name: check_interval
+              type: s
+            5:
+              name: check_period
+              type: s
+            6:
+              name: check_type
+              type: h
+            7:
+              name: current_check_attempt
+              type: h
+            8:
+              name: current_state
+              type: h
+            9:
+              name: downtime_depth
+              type: h
+            10:
+              name: enabled
+              type: '?'
+            11:
+              name: event_handler
+              type: s
+            12:
+              name: event_handler_enabled
+              type: '?'
+            13:
+              name: execution_time
+              type: s
+            14:
+              name: flap_detection_enabled
+              type: '?'
+            15:
+              name: has_been_checked
+              type: '?'
+            16:
+              name: host_id
+              type: I
+            17:
+              name: is_flapping
+              type: '?'
+            18:
+              name: last_check
+              type: q
+            19:
+              name: last_hard_state
+              type: h
+            20:
+              name: last_hard_state_change
+              type: q
+            21:
+              name: last_notification
+              type: q
+            22:
+              name: last_state_change
+              type: q
+            23:
+              name: last_time_down
+              type: q
+            24:
+              name: last_time_unreachable
+              type: q
+            25:
+              name: last_time_up
+              type: q
+            26:
+              name: last_update
+              type: q
+            27:
+              name: latency
+              type: s
+            28:
+              name: max_check_attempts
+              type: h
+            29:
+              name: next_check
+              type: q
+            30:
+              name: next_host_notification
+              type: q
+            31:
+              name: no_more_notifications
+              type: '?'
+            32:
+              name: notification_number
+              type: h
+            33:
+              name: notifications_enabled
+              type: '?'
+            34:
+              name: obsess_over
+              type: '?'
+            35:
+              name: passive_checks_enabled
+              type: '?'
+            36:
+              name: percent_state_change
+              type: s
+            37:
+              name: retry_interval
+              type: s
+            38:
+              name: should_be_scheduled
+              type: '?'
+            39:
+              name: state_type
+              type: h
+            40:
+              name: check_command
+              type: s
+            41:
+              name: output
+              type: s
+            42:
+              name: perf_data
+              type: s
+        15:
+          name: instance
+          fields:
+            1:
+              name: engine
+              type: s
+            2:
+              name: id
+              type: I
+            3:
+              name: name
+              type: s
+            4:
+              name: is_running
+              type: '?'
+            5:
+              name: pid
+              type: I
+            6:
+              name: program_end
+              type: q
+            7:
+              name: program_start
+              type: q
+            8:
+              name: version
+              type: s
+        16:
+          name: instance_status
+          fields:
+            1:
+              name: active_host_checks_enabled
+              type: '?'
+            2:
+              name: active_service_checks_enabled
+              type: '?'
+            3:
+              name: check_hosts_freshness
+              type: '?'
+            4:
+              name: check_services_freshness
+              type: '?'
+            5:
+              name: event_handler_enabled
+              type: '?'
+            6:
+              name: flap_detection_enabled
+              type: '?'
+            7:
+              name: id
+              type: I
+            8:
+              name: last_alive
+              type: q
+            9:
+              name: last_command_check
+              type: q
+            10:
+              name: notifications_enabled
+              type: '?'
+            11:
+              name: obsess_over_hosts
+              type: '?'
+            12:
+              name: obsess_over_services
+              type: '?'
+            13:
+              name: passive_host_checks_enabled
+              type: '?'
+            14:
+              name: passive_service_checks_enabled
+              type: '?'
+            15:
+              name: global_host_event_handler
+              type: s
+            16:
+              name: global_service_event_handler
+              type: s
+        17:
+          name: log_entry
+          fields:
+            1:
+              name: c_time
+              type: q
+            2:
+              name: host_id
+              type: I
+            3:
+              name: host_name
+              type: s
+            4:
+              name: instance_name
+              type: s
+            5:
+              name: issue_start_time
+              type: q
+            6:
+              name: log_type
+              type: h
+            7:
+              name: msg_type
+              type: h
+            8:
+              name: notification_cmd
+              type: s
+            9:
+              name: notification_contact
+              type: s
+            10:
+              name: retry
+              type: I
+            11:
+              name: service_description
+              type: s
+            12:
+              name: service_id
+              type: I
+            13:
+              name: status
+              type: h
+            14:
+              name: output
+              type: s
+        18:
+          name: module
+          fields:
+            1:
+              name: args
+              type: s
+            2:
+              name: enabled
+              type: '?'
+            3:
+              name: filename
+              type: s
+            4:
+              name: instance_id
+              type: I
+            5:
+              name: loaded
+              type: '?'
+            6:
+              name: should_be_loaded
+              type: '?'
+        23:
+          name: service
+          fields:
+            1:
+              name: acknowledged
+              type: '?'
+            2:
+              name: acknowledgement_type
+              type: h
+            3:
+              name: action_url
+              type: s
+            4:
+              name: active_checks_enabled
+              type: '?'
+            5:
+              name: check_freshness
+              type: '?'
+            6:
+              name: check_interval
+              type: s
+            7:
+              name: check_period
+              type: s
+            8:
+              name: check_type
+              type: h
+            9:
+              name: current_check_attempt
+              type: h
+            10:
+              name: current_state
+              type: h
+            11:
+              name: default_active_checks_enabled
+              type: '?'
+            12:
+              name: default_event_handler_enabled
+              type: '?'
+            13:
+              name: default_flap_detection_enabled
+              type: '?'
+            14:
+              name: default_notifications_enabled
+              type: '?'
+            15:
+              name: default_passive_checks_enabled
+              type: '?'
+            16:
+              name: downtime_depth
+              type: h
+            17:
+              name: display_name
+              type: s
+            18:
+              name: enabled
+              type: '?'
+            19:
+              name: event_handler
+              type: s
+            20:
+              name: event_handler_enabled
+              type: '?'
+            21:
+              name: execution_time
+              type: s
+            22:
+              name: first_notification_delay
+              type: s
+            23:
+              name: flap_detection_enabled
+              type: '?'
+            24:
+              name: flap_detection_on_critical
+              type: '?'
+            25:
+              name: flap_detection_on_ok
+              type: '?'
+            26:
+              name: flap_detection_on_unknown
+              type: '?'
+            27:
+              name: flap_detection_on_warning
+              type: '?'
+            28:
+              name: freshness_threshold
+              type: s
+            29:
+              name: has_been_checked
+              type: '?'
+            30:
+              name: high_flap_threshold
+              type: s
+            31:
+              name: host_id
+              type: I
+            32:
+              name: host_name
+              type: s
+            33:
+              name: icon_image
+              type: s
+            34:
+              name: icon_image_alt
+              type: s
+            35:
+              name: service_id
+              type: I
+            36:
+              name: is_flapping
+              type: '?'
+            37:
+              name: is_volatile
+              type: '?'
+            38:
+              name: last_check
+              type: q
+            39:
+              name: last_hard_state
+              type: h
+            40:
+              name: last_hard_state_change
+              type: q
+            41:
+              name: last_notification
+              type: q
+            42:
+              name: last_state_change
+              type: q
+            43:
+              name: last_time_critical
+              type: q
+            44:
+              name: last_time_ok
+              type: q
+            45:
+              name: last_time_unknown
+              type: q
+            46:
+              name: last_time_warning
+              type: q
+            47:
+              name: last_update
+              type: q
+            48:
+              name: latency
+              type: s
+            49:
+              name: low_flap_threshold
+              type: s
+            50:
+              name: max_check_attempts
+              type: h
+            51:
+              name: next_check
+              type: q
+            52:
+              name: next_notification
+              type: q
+            53:
+              name: no_more_notifications
+              type: '?'
+            54:
+              name: notes
+              type: s
+            55:
+              name: notes_url
+              type: s
+            56:
+              name: notification_interval
+              type: s
+            57:
+              name: notification_number
+              type: h
+            58:
+              name: notification_period
+              type: s
+            59:
+              name: notifications_enabled
+              type: '?'
+            60:
+              name: notify_on_critical
+              type: '?'
+            61:
+              name: notify_on_downtime
+              type: '?'
+            62:
+              name: notify_on_flapping
+              type: '?'
+            63:
+              name: notify_on_recovery
+              type: '?'
+            64:
+              name: notify_on_unknown
+              type: '?'
+            65:
+              name: notify_on_warning
+              type: '?'
+            66:
+              name: obsess_over
+              type: '?'
+            67:
+              name: passive_checks_enabled
+              type: '?'
+            68:
+              name: percent_state_change
+              type: s
+            69:
+              name: retry_interval
+              type: s
+            70:
+              name: scheduled_downtime_depth
+              type: h
+            71:
+              name: service_description
+              type: s
+            72:
+              name: should_be_scheduled
+              type: '?'
+            73:
+              name: stalk_on_critical
+              type: '?'
+            74:
+              name: stalk_on_ok
+              type: '?'
+            75:
+              name: stalk_on_unknown
+              type: '?'
+            76:
+              name: stalk_on_warning
+              type: '?'
+            77:
+              name: state_type
+              type: h
+            78:
+              name: check_command
+              type: s
+            79:
+              name: output
+              type: s
+            80:
+              name: perf_data
+              type: s
+            81:
+              name: retain_nonstatus_information
+              type: '?'
+            82:
+              name: retain_status_information
+              type: '?'
+        19:
+          name: service_check
+          fields:
+            1:
+              name: active_checks_enabled
+              type: '?'
+            2:
+              name: check_type
+              type: h
+            3:
+              name: host_id
+              type: I
+            4:
+              name: next_check
+              type: q
+            5:
+              name: service_id
+              type: I
+            6:
+              name: command_line
+              type: s
+        20:
+          name: service_dependency
+          fields:
+            1:
+              name: dependency_period
+              type: s
+            2:
+              name: dependent_host_id
+              type: I
+            3:
+              name: dependent_service_id
+              type: I
+            4:
+              name: enabled
+              type: '?'
+            5:
+              name: execution_failure_options
+              type: s
+            6:
+              name: host_id
+              type: I
+            7:
+              name: inherits_parent
+              type: '?'
+            8:
+              name: notification_failure_options
+              type: s
+            9:
+              name: service_id
+              type: I
+        21:
+          name: service_group
+          fields:
+            1:
+              name: id
+              type: I
+            2:
+              name: name
+              type: s
+            3:
+              name: enabled
+              type: '?'
+            4:
+              name: poller_id
+              type: I
+        22:
+          name: service_group_member
+          fields:
+            1:
+              name: id
+              type: I
+            2:
+              name: host_id
+              type: I
+            3:
+              name: service_id
+              type: I
+            4:
+              name: enabled
+              type: '?'
+            5:
+              name: group_name
+              type: s
+            6:
+              name: poller_id
+              type: I
+        24:
+          name: service_status
+          fields:
+            1:
+              name: acknowledged
+              type: '?'
+            2:
+              name: acknowledgement_type
+              type: h
+            3:
+              name: active_checks_enabled
+              type: '?'
+            4:
+              name: check_interval
+              type: s
+            5:
+              name: check_period
+              type: s
+            6:
+              name: check_type
+              type: h
+            7:
+              name: current_check_attempt
+              type: h
+            8:
+              name: current_state
+              type: h
+            9:
+              name: downtime_depth
+              type: h
+            10:
+              name: enabled
+              type: '?'
+            11:
+              name: event_handler
+              type: s
+            12:
+              name: event_handler_enabled
+              type: '?'
+            13:
+              name: execution_time
+              type: s
+            14:
+              name: flap_detection_enabled
+              type: '?'
+            15:
+              name: has_been_checked
+              type: '?'
+            16:
+              name: host_id
+              type: I
+            17:
+              name: host_name
+              type: s
+            18:
+              name: is_flapping
+              type: '?'
+            19:
+              name: last_check
+              type: q
+            20:
+              name: last_hard_state
+              type: h
+            21:
+              name: last_hard_state_change
+              type: q
+            22:
+              name: last_notification
+              type: q
+            23:
+              name: last_state_change
+              type: q
+            24:
+              name: last_time_critical
+              type: q
+            25:
+              name: last_time_ok
+              type: q
+            26:
+              name: last_time_unknown
+              type: q
+            27:
+              name: last_time_warning
+              type: q
+            28:
+              name: last_update
+              type: q
+            29:
+              name: latency
+              type: s
+            30:
+              name: max_check_attempts
+              type: h
+            31:
+              name: modified_attributes
+              type: I
+            32:
+              name: next_check
+              type: q
+            33:
+              name: next_notification
+              type: q
+            34:
+              name: no_more_notifications
+              type: '?'
+            35:
+              name: notification_number
+              type: h
+            36:
+              name: notifications_enabled
+              type: '?'
+            37:
+              name: obsess_over
+              type: '?'
+            38:
+              name: passive_checks_enabled
+              type: '?'
+            39:
+              name: percent_state_change
+              type: s
+            40:
+              name: retry_interval
+              type: s
+            41:
+              name: service_description
+              type: s
+            42:
+              name: service_id
+              type: I
+            43:
+              name: should_be_scheduled
+              type: '?'
+            44:
+              name: state_type
+              type: h
+            45:
+              name: check_command
+              type: s
+            46:
+              name: output
+              type: s
+            47:
+              name: perf_data
+              type: s
+        25:
+          name: instance_configuration
+          fields:
+            1:
+              name: loaded
+              type: '?'
+            2:
+              name: poller_id
+              type: I
+    2:
+      name: bbdo
+      api: BBDO_BBDO_TYPE
+      1:
+        name: version_response
+        fields:
+          1:
+            name: bbdo_major
+            type: h
+          2:
+            name: bbdo_minor
+            type: h
+          3:
+            name: bbdo_patch
+            type: h
+          4:
+            name: extensions
+            type: s
+      2:
+        name: ack
+        fields:
+          1:
+            name: acknowledged_events
+            type: I
+    3:
+        name: storage
+        api: BBDO_STORAGE_TYPE
+        1:
+          name: metric
+          fields:
+            1:
+              name: ctime
+              type: q
+            2:
+              name: interval
+              type: I
+            3:
+              name: metric_id
+              type: I
+            4:
+              name: name
+              type: s
+            5:
+              name: rrd_len
+              type: i
+            6:
+              name: value
+              type: s
+            7:
+              name: value_type
+              type: h
+            8:
+              name: is_for_rebuild
+              type: '?'
+            9:
+              name: host_id
+              type: I
+            10:
+              name: service_id
+              type: I
+        2:
+          name: rebuild
+          fields:
+            1:
+              name: end
+              type: '?'
+            2:
+              name: id
+              type: I
+            3:
+              name: is_index
+              type: '?'
+        3:
+          name: remove_graph
+          fields:
+            1:
+              name: id
+              type: I
+            2:
+              name: is_index
+              type: '?'
+        4:
+          name: status
+          fields:
+            1:
+              name: ctime
+              type: q
+            2:
+              name: index_id
+              type: I
+            3:
+              name: interval
+              type: I
+            4:
+              name: rrd_len
+              type: q
+            5:
+              name: state
+              type: h
+            6:
+              name: is_for_rebuild
+              type: '?'
+        5:
+          name: index_mapping
+          fields:
+            1:
+              name: index_id
+              type: I
+            2:
+              name: host_id
+              type: I
+            3:
+              name: service_id
+              type: I
+        6:
+          name: metric_mapping
+          fields:
+            1:
+              name: index_id
+              type: I
+            2:
+              name: metric_id
+              type: I
+    4:
+        name: correlation
+        api: BBDO_CORRELATION_TYPE
+        1:
+          name: engine_state
+          fields:
+            1:
+              name: started
+              type: '?'
+        2:
+          name: state
+          fields:
+            1:
+              name: ack_time
+              type: q
+            2:
+              name: current_state
+              type: I
+            3:
+              name: end_time
+              type: q
+            4:
+              name: host_id
+              type: I
+            5:
+              name: in_downtime
+              type: '?'
+            6:
+              name: service_id
+              type: I
+            7:
+              name: start_time
+              type: q
+        3:
+          name: issue
+          fields:
+            1:
+              name: ack_time
+              type: q
+            2:
+              name: end_time
+              type: q
+            3:
+              name: host_id
+              type: I
+            4:
+              name: service_id
+              type: I
+            5:
+              name: start_time
+              type: q
+        4:
+          name: issue_parent
+          fields:
+            1:
+              name: child_host_id
+              type: I
+            2:
+              name: child_service_id
+              type: I
+            3:
+              name: child_start_time
+              type: q
+            4:
+              name: end_time
+              type: q
+            5:
+              name: parent_host_id
+              type: I
+            6:
+              name: parent_service_id
+              type: I
+            7:
+              name: parent_start_time
+              type: q
+            8:
+              name: start_time
+              type: q
+        5:
+          name: log_issue
+          fields:
+            1:
+              name: log_ctime
+              type: q
+            2:
+              name: host_id
+              type: I
+            3:
+              name: service_id
+              type: I
+            4:
+              name: issue_start_time
+              type: q
+    # 5:
+    #   name: dumper
+    #   api: BBDO_DUMPER_TYPE
+    #   1:
+    #     name: ba_status
+    #     fields:
+    #       1:
+    #         name: ba_id
+    #         type: I
+    #   2:
+    #   3:
+    #   4:
+    #   5:
+    #   6:
+    #   7:
+    #   8:
+    #   9:
+    #   10:
+    #   11:
+    #   12:
+    #   13:
+    #   14:
+    #   15:
+    6:
+        name: BAM
+        api: BBDO_BAM_TYPE
+        1:
+          name: ba_status
+          fields:
+            1:
+              name: ba_id
+              type: I
+            2:
+              name: in_downtime
+              type: '?'
+            3:
+              name: last_state_change
+              type: q
+            4:
+              name: level_acknowledgement
+              type: s
+            5:
+              name: level_downtime
+              type: s
+            6:
+              name: level_nominal
+              type: s
+            7:
+              name: state
+              type: h
+            8:
+              name: state_changed
+              type: '?'
+        2:
+          name: kpi_status_event
+          fields:
+            1:
+              name: kpi_id
+              type: I
+            2:
+              name: in_downtime
+              type: '?'
+            3:
+              name: level_acknowledgement_hard
+              type: s
+            4:
+              name: level_acknowledgement_soft
+              type: s
+            5:
+              name: level_downtime_hard
+              type: s
+            6:
+              name: level_downtime_soft
+              type: s
+            7:
+              name: level_nominal_hard
+              type: s
+            8:
+              name: level_nominal_soft
+              type: s
+            9:
+              name: state_hard
+              type: h
+            10:
+              name: state_soft
+              type: h
+            11:
+              name: last_state_change
+              type: q
+            12:
+              name: last_impact
+              type: s
+            13:
+              name: valid
+              type: '?'
+        3:
+          name: meta_service_status_event
+          fields:
+            1:
+              name: meta_service_id
+              type: I
+            2:
+              name: value
+              type: s
+            3:
+              name: state_changed
+              type: '?'
+        4:
+          name: ba_event
+          fields:
+            1:
+              name: ba_id
+              type: I
+            2:
+              name: first_level
+              type: s
+            3:
+              name: end_time
+              type: q
+            4:
+              name: in_downtime
+              type: '?'
+            5:
+              name: start_time
+              type: q
+            6:
+              name: status
+              type: h
+        5:
+          name: kpi_event
+          fields:
+            1:
+              name: kpi_id
+              type: I
+            2:
+              name: end_time
+              type: q
+            3:
+              name: impact_level
+              type: I
+            4:
+              name: in_downtime
+              type: '?'
+            5:
+              name: first_output
+              type: s
+            6:
+              name: perfdata
+              type: s
+            7:
+              name: start_time
+              type: q
+            8:
+              name: status
+              type: h
+        6:
+          name: ba_duration_event
+          fields:
+            1:
+              name: ba_id
+              type: I
+            2:
+              name: real_start_time
+              type: q
+            3:
+              name: end_time
+              type: q
+            4:
+              name: start_time
+              type: q
+            5:
+              name: duration
+              type: I
+            6:
+              name: sla_duration
+              type: I
+            7:
+              name: timeperiod_is_default
+              type: '?'
+        7:
+          name: dimension_ba_event
+          fields:
+            1:
+              name: ba_id
+              type:
+            2:
+              name: ba_name
+              type: s
+            3:
+              name: ba_description
+              type: s
+            4:
+              name: sla_month_percent_crit
+              type: s
+            5:
+              name: sla_month_percent_warn
+              type: s
+            6:
+              name: sla_month_duration_crit
+              type: I
+            7:
+              name: sla_month_duration_warn
+              type: I
+        8:
+          name: dimension_kpi_event
+          fields:
+            1:
+              name: kpi_id
+              type: I
+            2:
+              name: ba_id
+              type: I
+            3:
+              name: ba_name
+              type: s
+            4:
+              name: host_id
+              type: I
+            5:
+              name: host_name
+              type: s
+            6:
+              name: service_id
+              type: I
+            7:
+              name: service_description
+              type: s
+            8:
+              name: kpi_ba_id
+              type: I
+            9:
+              name: kpi_ba_name
+              type: s
+            10:
+              name: meta_service_id
+              type: I
+            11:
+              name: meta_service_name
+              type: s
+            12:
+              name: boolean_id
+              type: I
+            13:
+              name: boolean_name
+              type: s
+            14:
+              name: impact_warning
+              type: s
+            15:
+              name: impact_critical
+              type: s
+            16:
+              name: impact_unknown
+              type: s
+        9:
+          name: dimension_ba_bv_relation_event
+          fields:
+            1:
+              name: ba_id
+              type: I
+            2:
+              name: bv_id
+              type: I
+        10:
+            name: dimension_bv_event
+            fields:
+                1:
+                    name: bv_id
+                    type: I
+                2:
+                    name: bv_name
+                    type: s
+                3:
+                    name: bv_description
+                    type: s
+        11:
+            name: dimension_table_signal
+            fields:
+                1:
+                    name: update_started
+                    type: '?'
+        12:
+            name: rebuild_signal
+            fields:
+                1:
+                    name: bas_to_rebuild
+                    type: s
+        13:
+            name: dimension_timeperiod
+            fields:
+                1:
+                    name: tp_id
+                    type: I
+                2:
+                    name: name
+                    type: s
+                3:
+                    name: monday
+                    type: s
+                4:
+                    name: tuesday
+                    type: s
+                5:
+                    name: wednesday
+                    type: s
+                6:
+                    name: thursday
+                    type: s
+                7:
+                    name: friday
+                    type: s
+                8:
+                    name: saturday
+                    type: s
+                9:
+                    name: sunday
+                    type: s
+        14:
+            name: dimension_ba_timeperiod_relation
+            fields:
+                1:
+                    name: ba_id
+                    type: I
+                2:
+                    name: timeperiod_id
+                    type: I
+                3:
+                    name: is_default
+                    type: '?'
+        15:
+            name: dimension_timeperiod_exception
+            fields:
+                1:
+                    name: timeperiod_id
+                    type: I
+                2:
+                    name: daterange
+                    type: s
+                3:
+                    name: timerange
+                    type: s
+        16:
+            name: dimension_timeperiod_exclusion
+            fields:
+                1:
+                    name: timeperiod_id
+                    type: I
+                2:
+                    name: excluded_timeperiod_id
+                    type: I
+        17:
+          name: inherited_downtime
+          fields:
+            1:
+              name: bad_id
+              type: I
+            2:
+              name: in_downtime
+              type: '?'
+    7:
+      name: extcmd
+      api: BBDO_EXTCMD_TYPE
+      1:
+        name: command_request
+        fields:
+            1:
+                name: command
+                type: s
+            2:
+                name: endp
+                type: s
+            3:
+                name: uuid
+                type: s
+            4:
+                name: with_partial_result
+                type: '?'
+      2:
+        name: command_result
+        fields:
+            1:
+                name: code
+                type: i
+            2:
+                name: uuid
+                type: s
+            3:
+                name: msg
+                type: s
+    65535:
+        name: internal
+        api: BBDO_INTERNAL_TYPE

@@ -30,13 +30,14 @@ from datetime import date
 class Es():
 
     def __init__(self):
-        self.es_conn = Elasticsearch()
+        # TODO: get host address for config file
+        self.es_conn = Elasticsearch([{'host': '192.168.122.125'},])
         #self.logger = logging.Logger()
         self.perf_data_regexp = re.compile('([0-9]+\.?[0-9]*)(.*)')
         # self.index_name = 'centreon-'+str(date.today())
 
     def insertData(self, perf_data):
-        print('writing to es; index: '+self.index_name)
+        #print('writing to es; index: '+self.index_name)
         doc_type = perf_data['doc_type']
         del perf_data['doc_type']
         for unit_metric in perf_data:
@@ -48,16 +49,16 @@ class Es():
             print('no index, creating')
             body = self.read_json(
                 "conf/elasticsearch_centreon_mappings.json")
-            self.es_conn.indices.create(
-                index=self.index_name, body=body)
-            if self.es_conn.indices.exists(index=self.index_name):
-                print('ok')
-            else:
-                print('not created')
+            try:
+                self.es_conn.indices.create(
+                    index=self.index_name, body=body)
+            except elasticsearch.RequestError as e:
+                # TODO: check different execptions to kill if needed
+                print(e)
 
     def insertMsg(self, msg):
         msg_recv = json.loads(msg[3], encoding=None, cls=None, object_hook=None,
-                              parse_float=None, parse_int=None, parse_constant=None, object_pairs_hook=None)
+                              parse_float=None, parse_int=None, parse_constant=None)
         # print(msg_recv)
         self.event_type = msg[2]
         self.checkIndices()
@@ -66,15 +67,14 @@ class Es():
                 self.insertData(self.processStatusData(msg_recv))
             if case('service_status'):
                 #print(msg_recv)
-                if msg_recv['perf_data'] is not "":
-                    self.insertData(self.processPerfData(msg_recv, self.perf_data_regexp))
+                self.insertData(self.processPerfData(msg_recv, self.perf_data_regexp))
                 self.insertData(self.processStatusData(msg_recv))
             if case('host') or case ('service'):
                 pass
             if case('host_check') or case ('service_check'):
                 pass
             if case.default:
-                return None
+                pass
 
     def read_json(self, filename):
         f_in = open(filename)
@@ -82,6 +82,7 @@ class Es():
         f_in.close()
         return data
 
+    # Refactor this function to only append things; no more index ....
     def processPerfData(self, data, regexp):
         perf_data = {}
         metrics = data['perf_data'].split(" ")
@@ -93,13 +94,17 @@ class Es():
             perf_data[i]['@timestamp'] = data['last_check']
             perf_data[i]['check_interval'] = round(float(data['check_interval']))*60
             perf_data[i]['service_id'] = data['service_id']
-            perf_data[i]['metric_name'], metric_data = metric.split("=")
-            while len(metric_data.split(";")) < 5:
-                metric_data = metric_data + ';'
-            metric_value_full, perf_data[i]['warn'], perf_data[i]['crit'], perf_data[i]['min'], perf_data[i]['max'] = metric_data.split(";")
-            val = self.perf_data_regexp.match(metric_value_full)
-            perf_data[i]['value'] = val.group(1)
-            perf_data[i]['unit'] = val.group(2)
+            try:
+                perf_data[i]['metric_name'], metric_data = metric.split("=")
+                while len(metric_data.split(";")) < 5:
+                    metric_data = metric_data + ';'
+                metric_value_full, perf_data[i]['warn'], perf_data[i]['crit'], perf_data[i]['min'], perf_data[i]['max'] = metric_data.split(";")
+                val = self.perf_data_regexp.match(metric_value_full)
+                perf_data[i]['value'] = val.group(1)
+                perf_data[i]['unit'] = val.group(2)
+            except ValueError:
+                perf_data.pop(i)
+            # print(perf_data)
             i += 1
         return perf_data
 

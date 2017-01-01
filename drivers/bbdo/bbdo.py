@@ -29,8 +29,10 @@ import json
 
 # project imports
 from .bbdo_proto import Bbdo_proto
+
 READY = "r"
 ERROR = "e"
+
 
 class Work():
     """ServerWorker"""
@@ -38,7 +40,8 @@ class Work():
     def __init__(self, options, worker):
         self.options = options
         self.worker = worker
-        self.logger = logging.getLogger('getbbdo.driver.bbdo.' + self.worker.identity)
+        self.logger = logging.getLogger(
+            'getbbdo.driver.bbdo.' + self.worker.identity)
         self.begin = 0
         self.host_status = 0
 
@@ -61,18 +64,19 @@ class Work():
         while not binded:
             try:
                 s.bind((HOST, PORT))
-                binded =1
+                binded = 1
             except socket.error as e:
                 self.logger.warning("can't bind to socket; waiting")
                 time.sleep(self.options['wait_socket'])
         s.listen(1)
         conn, addr = s.accept()
-        bbdo_stream = Bbdo_proto(self.logger)
-        print('Connected by', addr)
+        bbdo_stream = Bbdo_proto(self.logger, self.options)
+        print('Connected by ', addr)
         # Get negotiation data
         data = conn.recv(1024)
         # Send it back (like mirror)
         conn.sendall(data)
+        self.logger.debug(str("data sent back"))
 
         # Start to get data from broker (master or module)
         # while True:
@@ -80,11 +84,15 @@ class Work():
         while True:
             # Get bbdo header
             header = conn.recv(bbdo_stream.head_size)
+            self.logger.debug(str("header"))
+            self.logger.debug(str(header))
             if not header:
                 continue
             # Compute header to download full data stream
             bbdo_stream.ComputeHeader(header)
             data_stream = conn.recv(bbdo_stream.stream_size)
+            self.logger.debug(str("data_stream"))
+            self.logger.debug(str(data_stream))
             if not data_stream:
                 continue
             bbdo_stream.ExtractData(data_stream)
