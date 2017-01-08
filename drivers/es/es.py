@@ -31,7 +31,7 @@ class Es():
 
     def __init__(self):
         # TODO: get host address for config file
-        self.es_conn = Elasticsearch([{'host': '192.168.122.125'},])
+        self.es_conn = Elasticsearch([{'host': '192.168.122.1'},])
         #self.logger = logging.Logger()
         self.perf_data_regexp = re.compile('([0-9]+\.?[0-9]*)(.*)')
         # self.index_name = 'centreon-'+str(date.today())
@@ -64,13 +64,17 @@ class Es():
         self.checkIndices()
         with switch.Switch(msg[2]) as case:
             if case('host_status'):
+                # print('host_status')
+                # print(msg_recv)
                 self.insertData(self.processStatusData(msg_recv))
             if case('service_status'):
-                #print(msg_recv)
+                # print('service_status')
+                # print(msg_recv)
                 self.insertData(self.processPerfData(msg_recv, self.perf_data_regexp))
                 self.insertData(self.processStatusData(msg_recv))
             if case('host') or case ('service'):
-                pass
+                print('host or service')
+                print(msg_recv)
             if case('host_check') or case ('service_check'):
                 pass
             if case.default:
