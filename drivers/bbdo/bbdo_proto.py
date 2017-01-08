@@ -22,8 +22,8 @@ from struct import *
 import yaml
 import json
 import logging
-from PyCRC.CRCCCITT import CRCCCITT
-from PyCRC.CRC16 import CRC16
+# from PyCRC.CRCCCITT import CRCCCITT
+# from PyCRC.CRC16 import CRC16
 
 
 class Bbdo_proto():
@@ -31,13 +31,14 @@ class Bbdo_proto():
     def __init__(self, logger, options):
         # Load bbdo matrix definition
         self.options = options
+        self.logger = logger
         with open("conf/bbdo_proto_v"+str(self.options['version'])+".yml", 'r') as stream:
+            self.logger.debug('open bbdo proto: conf/bbdo_proto_v'+str(self.options['version'])+".yml")
             try:
                 self.bbdo_matrix = yaml.safe_load(stream)
             except yaml.YAMLError as exc:
                 print(exc)
         self.head_size = calcsize(self.bbdo_matrix['header']['fmt'])
-        self.logger = logger
 
     def ComputeHeader(self, data):
         if len(data) > self.head_size:
@@ -47,12 +48,14 @@ class Bbdo_proto():
         # if header 8 bytes => v1
         # if header 16 bytes => v2
 
-        # 8 bytes
-        self.checksum, self.stream_size, event_id = unpack_from(
-            self.bbdo_matrix['header']['fmt'], data)
-        # 16 bytes
-        self.checksum, self.stream_size, event_id, self.source_id, self.destination_id = unpack_from(
-            self.bbdo_matrix['header']['fmt'], data)
+        if self.options['version'] == 1:
+            # 8 bytes
+            self.checksum, self.stream_size, event_id = unpack_from(
+                self.bbdo_matrix['header']['fmt'], data)
+        else:
+            # 16 bytes
+            self.checksum, self.stream_size, event_id, self.source_id, self.destination_id = unpack_from(
+                self.bbdo_matrix['header']['fmt'], data)
         self.event_cat = event_id / 65536
         self.event_type = event_id - (self.event_cat * 65536)
 

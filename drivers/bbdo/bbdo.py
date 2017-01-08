@@ -87,7 +87,7 @@ class Work():
             self.logger.debug(str("header"))
             self.logger.debug(str(header))
             if not header:
-                continue
+                break
             # Compute header to download full data stream
             bbdo_stream.ComputeHeader(header)
             data_stream = conn.recv(bbdo_stream.stream_size)

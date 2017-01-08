@@ -11,7 +11,7 @@ output:
     workers: 5
     zmq_url: "inproc://broker_output"
     driver_options:
-        elastic_host: "localhost"
+        elastic_host: "192.168.122.1"
 admin:
     zmq_url: "inproc://admin"
 state:
