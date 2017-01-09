@@ -6,12 +6,16 @@ input:
     driver_options:
         wait_socket: 10
         version: 2
+        listen_ip: "localhost"
+        listen_port: 50007
+        type: "server"
 output:
     drivers: 'es_driver'
     workers: 5
     zmq_url: "inproc://broker_output"
     driver_options:
         elastic_host: "192.168.122.1"
+        elastic_port: 9200
 admin:
     zmq_url: "inproc://admin"
 state:

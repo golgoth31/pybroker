@@ -23,15 +23,15 @@ import json
 import switch
 import re
 import logging
-from elasticsearch import Elasticsearch
+import elasticsearch
 from datetime import date
 
 
 class Es():
 
-    def __init__(self):
+    def __init__(self, elastic_host, elastic_port):
         # TODO: get host address for config file
-        self.es_conn = Elasticsearch([{'host': '192.168.122.1'},])
+        self.es_conn = elasticsearch.Elasticsearch([{'host': elastic_host},])
         #self.logger = logging.Logger()
         self.perf_data_regexp = re.compile('([0-9]+\.?[0-9]*)(.*)')
         # self.index_name = 'centreon-'+str(date.today())
@@ -73,8 +73,10 @@ class Es():
                 self.insertData(self.processPerfData(msg_recv, self.perf_data_regexp))
                 self.insertData(self.processStatusData(msg_recv))
             if case('host') or case ('service'):
-                print('host or service')
-                print(msg_recv)
+                # engine startup; should be used to keep link between id and name
+                # print('host or service')
+                # print(msg_recv)
+                pass
             if case('host_check') or case ('service_check'):
                 pass
             if case.default:

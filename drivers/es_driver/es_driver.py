@@ -41,7 +41,7 @@ class Work():
             'getbbdo.worker.driver.es_driver.' + self.worker.identity)
         self.logger.debug('init task worker')
         self.begin = 0
-        self.elastic = Es()
+        self.elastic = Es(self.options["elastic_host"], self.options["elastic_port"])
 
     def run(self):
         # Startup message sequence

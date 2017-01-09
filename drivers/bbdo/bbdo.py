@@ -26,6 +26,9 @@ import socket
 import array
 import zmq
 import json
+import threading
+import SocketServer
+
 
 # project imports
 from .bbdo_proto import Bbdo_proto
@@ -33,6 +36,62 @@ from .bbdo_proto import Bbdo_proto
 READY = "r"
 ERROR = "e"
 
+
+class ThreadedTCPRequestHandler(SocketServer.BaseRequestHandler):
+
+    def handle(self):
+        self.host_status = 0
+        bbdo_stream = Bbdo_proto(self.server.logger, self.server.options)
+        print('Connected by ', self.client_address)
+        # Get negotiation data
+        data = self.request.recv(1024)
+        # Send it back (like mirror)
+        self.request.sendall(data)
+        self.server.logger.debug(str("data sent back"))
+
+        # Start to get data from broker (master or module)
+        # while True:
+        # wait for reply before sending data stream
+        while True:
+            # Get bbdo header
+            header = self.request.recv(bbdo_stream.head_size)
+            self.server.logger.debug(str("header"))
+            self.server.logger.debug(str(header))
+            if not header:
+                break
+            # Compute header to download full data stream
+            bbdo_stream.ComputeHeader(header)
+            data_stream = self.request.recv(bbdo_stream.stream_size)
+            self.server.logger.debug(str("data_stream"))
+            self.server.logger.debug(str(data_stream))
+            if not data_stream:
+                continue
+            bbdo_stream.ExtractData(data_stream)
+            self.server.logger.debug("Sending data to the server")
+
+            # host_status is received 2 times form engine, avoid resend the second time
+            if self.host_status == 0:
+                self.server.worker.send_multipart([bbdo_stream.GetEventTypeName(), bbdo_stream.GetBbdoMatrixOutput()])
+                self.server.logger.debug("getting answer from server")
+                msg = self.server.worker.recv_multipart()
+            if bbdo_stream.GetEventTypeName() == 'host_status':
+                if self.host_status == 0:
+                    self.host_status = 1
+                else:
+                    self.host_status = 0
+            # print(msg)
+
+class ThreadedTCPServer(SocketServer.ThreadingTCPServer):
+
+    def __init__(self, server_address, handlerClass, logger, options, worker):
+        SocketServer.ThreadingTCPServer.__init__(self, server_address, handlerClass)
+        self.logger = logger
+        self.options = options
+        self.worker = worker
+    # self.logger = logger
+    # self.options = options
+    # self.worker = worker
+    # pass
 
 class Work():
     """ServerWorker"""
@@ -43,7 +102,6 @@ class Work():
         self.logger = logging.getLogger(
             'getbbdo.driver.bbdo.' + self.worker.identity)
         self.begin = 0
-        self.host_status = 0
 
     def run(self):
         # Startup message sequence
@@ -56,56 +114,17 @@ class Work():
         self.logger.debug("Begin received, starting to get data")
         # End of startup message sequence
 
-        # Start the bbdo socket and listen
-        HOST = ''                 # Symbolic name meaning all available interfaces
-        PORT = 50007              # Arbitrary non-privileged port
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        binded = 0
-        while not binded:
-            try:
-                s.bind((HOST, PORT))
-                binded = 1
-            except socket.error as e:
-                self.logger.warning("can't bind to socket; waiting")
-                time.sleep(self.options['wait_socket'])
-        s.listen(1)
-        conn, addr = s.accept()
-        bbdo_stream = Bbdo_proto(self.logger, self.options)
-        print('Connected by ', addr)
-        # Get negotiation data
-        data = conn.recv(1024)
-        # Send it back (like mirror)
-        conn.sendall(data)
-        self.logger.debug(str("data sent back"))
+        # Port 0 means to select an arbitrary unused port
+        HOST, PORT = self.options["listen_ip"], self.options["listen_port"]
 
-        # Start to get data from broker (master or module)
-        # while True:
-        # wait for reply before sending data stream
-        while True:
-            # Get bbdo header
-            header = conn.recv(bbdo_stream.head_size)
-            self.logger.debug(str("header"))
-            self.logger.debug(str(header))
-            if not header:
-                break
-            # Compute header to download full data stream
-            bbdo_stream.ComputeHeader(header)
-            data_stream = conn.recv(bbdo_stream.stream_size)
-            self.logger.debug(str("data_stream"))
-            self.logger.debug(str(data_stream))
-            if not data_stream:
-                continue
-            bbdo_stream.ExtractData(data_stream)
-            self.logger.debug("Sending data to the server")
+        server = ThreadedTCPServer((HOST, PORT), ThreadedTCPRequestHandler, self.logger, self.options, self.worker)
+        ip, port = server.server_address
 
-            # host_status is received 2 times form engine, avoid resend the second time
-            if self.host_status == 0:
-                self.worker.send_multipart([bbdo_stream.GetEventTypeName(), bbdo_stream.GetBbdoMatrixOutput()])
-                self.logger.debug("getting answer from server")
-                msg = self.worker.recv_multipart()
-            if bbdo_stream.GetEventTypeName() == 'host_status':
-                if self.host_status == 0:
-                    self.host_status = 1
-                else:
-                    self.host_status = 0
-            # print(msg)
+        # Start a thread with the server -- that thread will then start one
+        # more thread for each request
+        server_thread = threading.Thread(target=server.serve_forever)
+        # Exit the server thread when the main thread terminates
+        server_thread.daemon = True
+        server_thread.start()
+        print "Server loop running in thread:", server_thread.name
+        #
