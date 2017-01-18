@@ -1,0 +1,145 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+# pybroker
+# Copyright (c) 2016 David Sabatie <pybroker@notrenet.com>
+#
+# This file is part of Pybroker.
+#
+# Foobar is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Foobar is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+
+# import standard modules modules
+import logging
+import logging.handlers
+import yaml
+import multiprocessing
+import string
+import argparse
+
+# import pybroker modules
+from core import Pybroker_server
+
+##########################################################################
+# Define global log structure
+##########################################################################
+# logger = logging.basicConfig(filename='logs/getbbdo',level=logging.DEBUG)
+logger = logging.getLogger('pybroker')
+logger.setLevel(logging.INFO)
+# create file handler which logs even debug messages
+fh = logging.handlers.RotatingFileHandler(
+    'logs/pybroker', maxBytes=10000000, backupCount=5)
+fh.setLevel(logging.DEBUG)
+# create console handler for debugging purpose only
+ch = logging.StreamHandler()
+ch.setLevel(logging.DEBUG)
+# create formatter and add it to the handlers
+formatter = logging.Formatter(
+    '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+fh.setFormatter(formatter)
+ch.setFormatter(formatter)
+# add the handlers to the logger
+logger.addHandler(fh)
+
+##########################################################################
+# Getting arguments
+##########################################################################
+parser = argparse.ArgumentParser(
+    description='Pybroker help text', add_help=True)
+
+args_defined = parser.add_argument_group('Global arguments')
+args_defined.add_argument(
+    '-v', '--version', action='version', version='%(prog)s 1.0')
+args_defined.add_argument(
+    '--debug', action='store_true', help='debug mode')
+args_defined.add_argument(
+    '-d', '--daemon', action='store_true', help='go to daemon mode')
+args_defined.add_argument(
+    '-f', '--file', help='configuration file to use')
+args_defined.add_argument(
+    '-l', '--log', help='log file to use')
+args = parser.parse_args()
+
+##########################################################################
+# Initialise some global variables
+##########################################################################
+
+##########################################################################
+# Some basic functions
+##########################################################################
+
+
+def readConf():
+    """read configuration files (common and streams)"""
+    logger.info('Read global configuration file: ' + "conf/pybroker.yml.")
+    with open("conf/pybroker.yml", 'r') as data:
+        try:
+            options = yaml.safe_load(data)
+            configLoglevel = getattr(logging, options['log']['level'].upper())
+            if args.debug or configLoglevel == 10:
+                logger.setLevel(logging.DEBUG)
+                logger.addHandler(ch)
+                logger.debug('Entering debug mode.')
+            else:
+                logger.setLevel(configLoglevel)
+        except yaml.YAMLError as exc:
+            logger.exception(exc)
+            exitMessage(1)
+    logger.info(str(len(options['streams']['list'])) + " stream(s) to start")
+    streams = {}
+    for stream in options['streams']['list']:
+        with open(options['streams']['path'] + "/" + stream + ".yml", 'r') as data:
+            try:
+                logger.debug('reading streams file: ' +
+                             options['streams']['path'] + "/" + stream + ".yml")
+                streams[stream] = {}
+                streams[stream] = yaml.safe_load(data)
+                logger.debug('stream ' + stream +
+                             ' => ' + str(streams[stream]))
+            except yaml.YAMLError as exc:
+                logger.exception(exc)
+                exitMessage(1)
+    return options, streams
+
+
+def exitMessage(exit_code):
+    """ cleaner exit message """
+    logger.info("End of pybroker\n")
+    exit(exit_code)
+
+
+def main():
+    """main function"""
+    logger.info(
+        '******************** Starting bbdo broker daemon *******************')
+    options, streams = readConf()
+    logger.debug('Starting server')
+    server = multiprocessing.Process(
+        target=Pybroker_server,
+        args=(options, streams)
+    )
+    server.start()
+    server.join()
+    logger.info(
+        '******************** bbdo broker daemon ended *******************')
+
+##########################################################################
+# Start main function
+##########################################################################
+if __name__ == "__main__":
+    """Start main function"""
+    try:
+        main()
+    except (KeyboardInterrupt, SystemExit, NameError) as error:
+        # logger.exception(error)
+        exit(1)

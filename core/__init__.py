@@ -1,3 +1,4 @@
+"""Init for core."""
 # pybroker
 # Copyright (c) 2016 David Sabatie <pybroker@notrenet.com>
 #
@@ -16,5 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 
-from .core_worker import Core_worker
-from .core_server import Core_server
+from .pybroker_worker import Pybroker_worker
+from .pybroker_server import Pybroker_server
+from .pybroker_stream import Pybroker_stream
+from .pybroker_common import Pybroker_switch, Pybroker_zmq

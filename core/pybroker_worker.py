@@ -25,7 +25,7 @@ import time
 import json
 import logging
 
-class Core_worker(threading.Thread):
+class Pybroker_worker(threading.Thread):
     """ServerWorker"""
 
     def __init__(self, id, w_state, w_type, options):
@@ -34,45 +34,37 @@ class Core_worker(threading.Thread):
         self.options = options
         self.state = w_state
         self.id = id
-        self.context = zmq.Context.instance()
-        identity = "{0}_{1}".format(self.type, str(self.id))
-        self.logger = logging.getLogger('getbbdo.worker.' + identity)
-        self.logger.debug('init worker')
-        if self.type == 'input':
-            self.worker = self.context.socket(zmq.REQ)
-        elif self.type == 'output':
-            self.worker = self.context.socket(zmq.REP)
-        else:
-            self.logger.debug('unknown worker type')
-            sys.exit(status="error")
-        self.worker.identity = identity #identity.encode('ascii')
-        self.worker.connect(self.options['zmq_url'])
-        self.logger.debug("server zmq url: "+self.options['zmq_url'])
+        # self.context = zmq.Context.instance()
+        # identity = "{0}_{1}".format(self.type, str(self.id))
+        # self.logger = logging.getLogger('getbbdo.worker.' + identity)
+        # self.logger.debug('init worker')
+        # if self.type == 'input':
+        #     self.worker = self.context.socket(zmq.REQ)
+        # elif self.type == 'output':
+        #     self.worker = self.context.socket(zmq.REP)
+        # else:
+        #     self.logger.debug('unknown worker type')
+        #     sys.exit(status="error")
+
+        # connect to sockets
+        if self.options['in_device'] is not none:
+            zmq_in = self.context.socket(self.options['in_device']['out_type'])
+            zmq_in.connect("inproc://"+self.options['in_device']['name']+"_out")
+        if self.options['out_device'] is not none:
+            zmq_out = self.context.socket(self.options['out_device']['in_type'])
+            zmq_out.bind("inproc://"+self.options['out_device']['name']+"_out")
+
+        # self.worker.identity = identity #identity.encode('ascii')
+        # self.worker.connect(self.options['zmq_url'])
+        # self.logger.debug("server zmq url: "+self.options['zmq_url'])
         # self.worker_state = self.context.socket(zmq.PUSH)
         # self.worker_state.connect(self.state['zmq_url'])
         self.logger.debug("state zmq url: "+self.state['zmq_url'])
 
     def run(self):
-
         self.logger.debug("start worker: " + self.worker.identity)
-
         driver = self.loadDriver()
         driver.run()
-        # while True:
-        #     self.logger.debug(identity + " receiving message")
-        #     msg = worker.recv_multipart()
-        #     if not msg:
-        #         break
-        #     # print(msg)
-        #     # add centreon id
-        #     self.logger.debug(identity + " sending to celery")
-        #     sent_msg = insert.delay(msg)
-        #     # sent_msg.get(timeout=1)
-        #
-        #     self.logger.debug(identity + " sending to server")
-        #     worker.send(LRU_READY)
-        # worker.close()
-        # self.context.term()
 
     def loadDriver(self):
         self.logger.debug('try to load driver')

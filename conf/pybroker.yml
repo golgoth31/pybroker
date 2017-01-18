@@ -1,27 +1,33 @@
 ---
-input:
-    drivers: 'bbdo'
-    workers: 1
-    zmq_url: "inproc://broker_input"
-    driver_options:
-        wait_socket: 10
-        version: 2
-        listen_ip: "localhost"
-        listen_port: 50007
-        type: "server"
-output:
-    drivers: 'es_driver'
-    workers: 5
-    zmq_url: "inproc://broker_output"
-    driver_options:
-        elastic_host: "192.168.122.1"
-        elastic_port: 9200
-admin:
-    zmq_url: "inproc://admin"
-state:
-    zmq_url: "inproc://state"
-admin_inside:
-    zmq_url: "inproc://admin_inside"
+# Streams to start
+streams:
+  list:
+    - bbdo
+    # - test
+  # Where to find streams configuration
+  path: "conf/streams"
 
+# url to manage pybroker with messages
+# listen for messages from outside world
+# type can be: tcp or inproc (with inproc, bind* is disabled)
+external:
+  driver: zmq
+  type: tcp
+  bind_address: 127.0.0.1
+  bind_port: 10250
+# monitoring statistics
+monitoring:
+  driver: zmq
+  type: tcp
+  bind_address: 127.0.0.1
+  bind_port: 10251
+# internal port
+# internal:
+#   driver: zmq
+#   type: inproc
+#   bind_address: 127.0.0.1
+#   bind_port: 10252
+
+# logging parameters
 log:
-  level: DEBUG
+  level: debug # DEBUG, INFO, WARN, CRITICAL, ...

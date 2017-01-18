@@ -24,15 +24,14 @@ import sys
 import time
 import json
 import logging
-from pprint import pprint
-import switch
 
-from core import Core_worker
+
+from core import Pybroker_worker
 # from drivers.bbdo import Bbdo_listener
 
-class Core_server():
+class Pybroker_stream():
 
-    def __init__(self, options):
+    def __init__(self, options, streams):
         #self.id = id
         self.options = options
         self.broker_input_url = self.options['input']['zmq_url']
@@ -42,8 +41,15 @@ class Core_server():
         self.broker_admin_inside_url = self.options['admin_inside']['zmq_url']
         self.logger = logging.getLogger('getbbdo.server')
         self.logger.debug('init server')
+
+        # init internal communication
+        self.devices = {}
+        self.devices['incache'] = {name: 'incache', in_type: zmq.PULL, out_type: zmq.PUSH, mon_type: zmq.PUB}
+        self.devices['cachefilter'] = {name: 'cachefilter', in_type: zmq.PULL, out_type: zmq.PUSH, mon_type: zmq.PUB}
+        self.devices['filterout'] = {name: 'filterout', in_type: zmq.PULL, out_type: zmq.PUSH, mon_type: zmq.PUB}
+
         # threading.Thread.__init__(self)
-        self.run()
+        # self.run()
 
     def run(self):
         self.logger.debug('start server')
@@ -108,6 +114,22 @@ class Core_server():
 
         # self.checkWorkerReady(broker_state, poll_state)
 
+        # Start threads for internal communication
+        zmq_devices = {}
+        for device in self.devices:
+            zmq_devices[device] = self._startZmqDevices(device)
+        # incache_context = incache.context_factory()
+
+        # Start workers
+        # 1 => caches
+        # 2 => outputs
+        # 3 => filters
+        # 4 => inputs
+        _startWorker('caches', in_device=self.devices['incache'], out_device=self.devices['cachefilter'])
+        _startWorker('outputs', in_device=self.devices['filterout'])
+        _startWorker('filters', in_device=self.devices['cachefilter'], out_device=self.devices['filterout'])
+        _startWorker('inputs', out_device=self.devices['incache'])
+
         while True:
             # print(self.outputs)
             if self.outputs:
@@ -151,13 +173,17 @@ class Core_server():
         broker_output.close()
         context.term()
 
-    def startWorker(self, worker_index, worker_state, worker_type, worker_options):
+    def _startWorker(self, worker, in_device=None, out_device=None):
         # print(worker_state)
-        worker = Core_worker(worker_index, worker_state, worker_type, worker_options)
-        worker.start()
-        return(worker)
+        for i in self.options[worker]:
+            for options in self.options[worker][i]:
+                self.options[worker][i]['in_device'] = in_device
+                self.options[worker][i]['out_device'] = out_device
+                worker = Pybroker_worker(options, self.options['state'], worker, self.options[worker][i])
+                worker.start()
+        # return(worker)
 
-    def checkWorkerReady(self, socket, poll):
+    def _checkWorkerReady(self, socket, poll):
         # wait for one worker ....
         socks = dict(poll.poll())
         if socks.get(socket) == zmq.POLLIN:
@@ -181,8 +207,49 @@ class Core_server():
                     if case.default:
                         started = 0
 
-    # def manageAdmin(self):
-    #
-    # def manageOutput(self):
-    #
-    # def manageInput(self):
+    def _startZmqDevices(self, device_name):
+        device = zmq.devices.ThreadProxy(in_type=self.options['devices'][device_name]['in_type'], out_type=self.options['devices'][device_name]['out_type'], mon_type=self.options['devices'][device_name]['mon_type'])
+        device.connect_in("inproc://"+device_name+"_in")
+        device.bind_out("inproc://"+device_name+"_out")
+        device.bind_mon("inproc://"+device_name+"_mon")
+        device.start()
+        return device
+
+    def _startStream(self, worker, in_device=None, out_device=None):
+        """Start worker based on options."""
+        for i in self.options[worker]:
+            for options in self.options[worker][i]:
+                self.options[worker][i]['in_device'] = in_device
+                self.options[worker][i]['out_device'] = out_device
+                worker = Pybroker_worker(
+                    options,
+                    self.options['state'],
+                    worker,
+                    self.options[worker][i]
+                )
+                worker.start()
+
+    def _checkStreamReady(self, socket, poll):
+        """Check if worker is ready."""
+        # wait for one worker ....
+        socks = dict(poll.poll())
+        if socks.get(socket) == zmq.POLLIN:
+            started = 0
+            while not started:
+                self.logger.debug("getting self.broker_state")
+                msg = socket.recv_multipart()
+                # self.logger.debug(msg)
+                if not msg:
+                    continue
+                address, state = msg
+                for case in pybroker_common.Pybroker_switch(state):
+                    if case('e'):
+                        self.logger.debug("no worker intialized, waiting ...")
+                        time.sleep(1)
+                        started = 0
+                    if case('r') or case('service'):
+                        self.outputs.append(address)
+                        self.logger.debug("Output " + address + " ready")
+                        started = 1
+                    if case.default:
+                        started = 0
