@@ -26,7 +26,7 @@ import logging
 # from PyCRC.CRC16 import CRC16
 
 
-class Bbdo_proto():
+class Bbdo():
 
     def __init__(self, logger, options):
         # Load bbdo matrix definition
@@ -41,6 +41,7 @@ class Bbdo_proto():
         self.head_size = calcsize(self.bbdo_matrix['header']['fmt'])
 
     def ComputeHeader(self, data):
+        self.header = {}
         if len(data) > self.head_size:
             print('not a valid header')
             exit()
@@ -50,14 +51,15 @@ class Bbdo_proto():
 
         if self.options['version'] == 1:
             # 8 bytes
-            self.checksum, self.stream_size, event_id = unpack_from(
+            self.header['checksum'], self.header['stream_size'], event_id = unpack_from(
                 self.bbdo_matrix['header']['fmt'], data)
         else:
             # 16 bytes
-            self.checksum, self.stream_size, event_id, self.source_id, self.destination_id = unpack_from(
+            self.header['checksum'], self.header['stream_size'], event_id, self.header['source_id'], self.header['destination_id'] = unpack_from(
                 self.bbdo_matrix['header']['fmt'], data)
-        self.event_cat = event_id / 65536
-        self.event_type = event_id - (self.event_cat * 65536)
+        self.header['event_cat'] = event_id / 65536
+        self.header['event_type'] = event_id - (self.header['event_cat'] * 65536)
+        return json.dumps(self.header)
 
     def ExtractData(self, data):
         offset = 0

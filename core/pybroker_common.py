@@ -4,7 +4,9 @@ from zmq.devices import ThreadDevice, Device
 from zmq.utils import jsonapi
 import json
 
+
 class Pybroker_switch(object):
+
     def __init__(self, value):
         self.value = value
         self.fall = False
@@ -24,6 +26,7 @@ class Pybroker_switch(object):
         else:
             return False
 
+
 class Pybroker_zmq():
 
     def __init__(self, logger):
@@ -32,27 +35,34 @@ class Pybroker_zmq():
     def startZmqDevices(self, devices):
         """Start zmq communication devices."""
         contexts = []
+        device = {}
         try:
             for device_name in devices:
-                self.logger.debug("Starting device: "+device_name)
-                device = ThreadDevice(
-                    device_type=devices[device_name]['dev_type'],
+                self.logger.debug("Starting device: " + device_name)
+                device[device_name] = ThreadDevice(
+                    # device_type=devices[device_name]['dev_type'],
                     in_type=devices[device_name]['in_type'],
                     out_type=devices[device_name]['out_type']
                 )
                 if 'in_url' in devices[device_name]:
-                    device.bind_in(devices[device_name]['in_url'])
+                    device[device_name].bind_in(devices[device_name]['in_url'])
                 else:
-                    device.bind_in("inproc://" + device_name + "_in")
+                    self.logger.debug(device_name + ' in binding name: ' + devices[device_name]['dev_name'])
+                    device[device_name].bind_in(
+                        "inproc://" + devices[device_name]['dev_name'] + "_in")
                 if 'out_url' in devices[device_name]:
-                    device.connect_out(devices[device_name]['out_url'])
+                    device[device_name].bind_out(devices[device_name]['out_url'])
                 else:
-                    device.connect_out("inproc://" + device_name + "_out")
-                ct = device.context_factory()
-                ct.identity = device_name
-                device.start()
-                contexts.append(device.context_factory())
-                self.logger.debug("Done: "+device_name)
+                    self.logger.debug(device_name + ' out binding name: ' + devices[device_name]['dev_name'])
+                    device[device_name].bind_out(
+                        "inproc://" + devices[device_name]['dev_name'] + "_out")
+                ct = device[device_name].context_factory()
+                # modify identity of context ....
+                ct.identity = device_name+'_____1'
+                device[device_name].start()
+                contexts.append(device[device_name].context_factory())
+                self.logger.debug("Done: " + device_name)
+            self.logger.debug(contexts)
             return contexts
         except Exception as e:
             self.logger.exception(e)

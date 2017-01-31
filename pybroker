@@ -26,6 +26,7 @@ import yaml
 import multiprocessing
 import string
 import argparse
+import os
 
 # import pybroker modules
 from core import Pybroker_server
@@ -73,10 +74,56 @@ args = parser.parse_args()
 ##########################################################################
 # Initialise some global variables
 ##########################################################################
+# hidden_streams = {
+#     'path': "core/streams",
+#     'list': [
+#         'external',
+#         'internal',
+#         'monitoring'
+#     ]
+# }
+# path to internal streams
+hidden_streams = "core/streams"
 
 ##########################################################################
 # Some basic functions
 ##########################################################################
+
+
+def readStreamFile(streams):
+    ret_streams = {}
+    # for stream in streams['list']:
+    #     with open(streams['path'] + "/" + stream + ".yml", 'r') as data:
+    #         try:
+    #             logger.debug('reading streams file: ' +
+    #                          streams['path'] + "/" + stream + ".yml")
+    #             ret_streams[stream] = {}
+    #             ret_streams[stream] = yaml.safe_load(data)
+    #             logger.debug('stream ' + stream +
+    #                          ' => ' + str(ret_streams[stream]))
+    #         except yaml.YAMLError as exc:
+    #             logger.exception(exc)
+    #             exitMessage(1)
+    # return ret_streams
+    for root, dirs, files in os.walk(streams):
+        for file in files:
+            if file.endswith('.yml') or file.endswith('.yaml'):
+                stream, ext = os.path.splitext(file)
+                with open(os.path.join(root, file), 'r') as data:
+                    try:
+                        logger.debug('reading stream file: ' +
+                                     os.path.join(root, file))
+                        ret_streams[stream] = {}
+                        ret_streams[stream] = yaml.safe_load(data)
+                        logger.debug('stream ' + stream +
+                                     ' => ' + str(ret_streams[stream]))
+                    except yaml.YAMLError as exc:
+                        logger.exception(exc)
+                        exitMessage(1)
+                    # except:
+                    #     logger.exception('crit')
+                    #     exitMessage(1)
+    return ret_streams
 
 
 def readConf():
@@ -95,21 +142,20 @@ def readConf():
         except yaml.YAMLError as exc:
             logger.exception(exc)
             exitMessage(1)
-    logger.info(str(len(options['streams']['list'])) + " stream(s) to start")
-    streams = {}
-    for stream in options['streams']['list']:
-        with open(options['streams']['path'] + "/" + stream + ".yml", 'r') as data:
-            try:
-                logger.debug('reading streams file: ' +
-                             options['streams']['path'] + "/" + stream + ".yml")
-                streams[stream] = {}
-                streams[stream] = yaml.safe_load(data)
-                logger.debug('stream ' + stream +
-                             ' => ' + str(streams[stream]))
-            except yaml.YAMLError as exc:
-                logger.exception(exc)
-                exitMessage(1)
-    return options, streams
+    # options['hidden_streams'] = hidden_streams
+    # loading pybroker streams
+
+    logger.debug('hidden streams: ' + str(hidden_streams))
+    hidden = readStreamFile(hidden_streams)
+
+    options['hidden_streams'] = hidden
+
+    # loading functional streams
+    logger.debug('Functional streams: ' + str(options['streams']))
+    streams = readStreamFile(options['streams'])
+    logger.info(str(len(streams)) + " stream(s) to start")
+
+    return options, streams, hidden
 
 
 def exitMessage(exit_code):
@@ -122,11 +168,11 @@ def main():
     """main function"""
     logger.info(
         '******************** Starting bbdo broker daemon *******************')
-    options, streams = readConf()
+    options, streams, hidden = readConf()
     logger.debug('Starting server')
     server = multiprocessing.Process(
         target=Pybroker_server,
-        args=(options, streams)
+        args=(options, hidden, streams)
     )
     server.start()
     server.join()

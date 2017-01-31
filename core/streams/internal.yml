@@ -1,0 +1,24 @@
+---
+active: no
+inputs:
+  active: yes
+  list:
+    - external:
+        workers: 1
+        links:
+            out: None
+            in: None
+        options:
+            driver: zmq
+            type: tcp
+            bind_address: 127.0.0.1
+            bind_port: 10251
+
+caches:
+  active: no
+
+filters:
+  active: no
+
+outputs:
+  active: no

@@ -20,7 +20,7 @@
 
 import sys
 import time
-import json
+import yaml
 import logging
 import socket
 import array
@@ -28,10 +28,12 @@ import zmq
 import json
 import threading
 import SocketServer
-
+import cPickle as pickle
+from struct import *
+import base64
 
 # project imports
-from .bbdo_proto import Bbdo_proto
+from .bbdo import Bbdo
 
 READY = "r"
 ERROR = "e"
@@ -41,45 +43,63 @@ class ThreadedTCPRequestHandler(SocketServer.BaseRequestHandler):
 
     def handle(self):
         self.host_status = 0
-        bbdo_stream = Bbdo_proto(self.server.logger, self.server.options)
-        print('Connected by ', self.client_address)
+        self.server.logger.debug('Connected by '+ str(self.client_address))
         # Get negotiation data
         data = self.request.recv(1024)
         # Send it back (like mirror)
         self.request.sendall(data)
         self.server.logger.debug(str("data sent back"))
 
+        # read bbdo yaml file
+        with open("conf/bbdo_proto_v"+str(self.server.options['version'])+".yml", 'r') as stream:
+            self.server.logger.debug('open bbdo proto: conf/bbdo_proto_v'+str(self.server.options['version'])+".yml")
+            try:
+                bbdo_matrix = yaml.safe_load(stream)
+            except yaml.YAMLError as exc:
+                print(exc)
+        head_size = calcsize(bbdo_matrix['header']['fmt'])
+
         # Start to get data from broker (master or module)
         # while True:
         # wait for reply before sending data stream
         while True:
             # Get bbdo header
-            header = self.request.recv(bbdo_stream.head_size)
-            self.server.logger.debug(str("header"))
-            self.server.logger.debug(str(header))
-            if not header:
+            header_stream = self.request.recv(head_size)
+            self.server.logger.debug("Header")
+            self.server.logger.debug(str(header_stream))
+            if not header_stream:
                 break
             # Compute header to download full data stream
-            bbdo_stream.ComputeHeader(header)
-            data_stream = self.request.recv(bbdo_stream.stream_size)
-            self.server.logger.debug(str("data_stream"))
-            self.server.logger.debug(str(data_stream))
-            if not data_stream:
+            data = {}
+            if len(header_stream) > head_size:
+                print('not a valid header')
+                exit(1)
+            # TODO: add check for bbdo protocol version
+            # if header 8 bytes => v1
+            # if header 16 bytes => v2
+
+            if self.server.options['version'] == 1:
+                # 8 bytes
+                data['checksum'], data['stream_size'], event_id = unpack_from(
+                    bbdo_matrix['header']['fmt'], header_stream)
+            else:
+                # 16 bytes
+                data['checksum'], data['stream_size'], event_id, data['source_id'], data['destination_id'] = unpack_from(
+                    bbdo_matrix['header']['fmt'], header_stream)
+            data['event_cat'] = event_id / 65536
+            data['event_type'] = event_id - (data['event_cat'] * 65536)
+
+            data['payload'] = base64.b64encode(self.request.recv(data['stream_size']))
+            self.server.logger.debug("Payload")
+            self.server.logger.debug(str(data['payload']))
+            if not data['payload']:
                 continue
-            bbdo_stream.ExtractData(data_stream)
-            self.server.logger.debug("Sending data to the server")
+            self.server.logger.debug("Sending data to the filters")
 
             # host_status is received 2 times form engine, avoid resend the second time
             if self.host_status == 0:
-                self.server.worker.send_multipart([bbdo_stream.GetEventTypeName(), bbdo_stream.GetBbdoMatrixOutput()])
-                self.server.logger.debug("getting answer from server")
-                msg = self.server.worker.recv_multipart()
-            if bbdo_stream.GetEventTypeName() == 'host_status':
-                if self.host_status == 0:
-                    self.host_status = 1
-                else:
-                    self.host_status = 0
-            # print(msg)
+                # self.server.worker.send_multipart([data])
+                self.server.worker.send_json(data)
 
 class ThreadedTCPServer(SocketServer.ThreadingTCPServer):
 
@@ -88,36 +108,25 @@ class ThreadedTCPServer(SocketServer.ThreadingTCPServer):
         self.logger = logger
         self.options = options
         self.worker = worker
-    # self.logger = logger
-    # self.options = options
-    # self.worker = worker
-    # pass
 
 class Work():
     """ServerWorker"""
 
     def __init__(self, options, worker):
         self.options = options
-        self.worker = worker
+        self.output = worker['out']
         self.logger = logging.getLogger(
-            'getbbdo.driver.bbdo.' + self.worker.identity)
+            'pybroker.driver.bbdo.inputs.' + self.output.identity)
         self.begin = 0
 
     def run(self):
         # Startup message sequence
-        self.logger.debug("Saying hello to the server")
-        self.worker.send_multipart(READY)
-        self.logger.debug("Waiting for begin message")
-        while not self.begin:
-            msg = self.worker.recv_multipart()
-            self.begin = msg[0]
-        self.logger.debug("Begin received, starting to get data")
-        # End of startup message sequence
+        self.logger.debug("Saying hello to the server from "+self.output.identity)
 
         # Port 0 means to select an arbitrary unused port
         HOST, PORT = self.options["listen_ip"], self.options["listen_port"]
 
-        server = ThreadedTCPServer((HOST, PORT), ThreadedTCPRequestHandler, self.logger, self.options, self.worker)
+        server = ThreadedTCPServer((HOST, PORT), ThreadedTCPRequestHandler, self.logger, self.options, self.output)
         ip, port = server.server_address
 
         # Start a thread with the server -- that thread will then start one
