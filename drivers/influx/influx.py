@@ -22,46 +22,47 @@
 import json
 import re
 import logging
-import elasticsearch
+import influxdb
 from datetime import date
 
 
-class Es():
+class Influx():
 
     def __init__(self, elastic_host, elastic_port):
         # TODO: get host address for config file
         self.logger = logging.getLogger(
-            'elasticsearch')
+            'influxdb')
         self.logger.setLevel(logging.DEBUG)
         try:
-            self.es_conn = elasticsearch.Elasticsearch([{'host': elastic_host}, ])
+            self.influx_conn = influxdb.InfluxDBClient(
+                '192.168.122.1', 8086, '', '', 'centreon-metrics')
         except:
             self.logger.exception("can't connect to: " + elastic_host)
+        try:
+            print('create influxdb')
+            self.influx_conn.create_database('centreon-metrics')
+        except influxdb.InfluxDBClientError:
+            print('can not create')
+            self.logger.debug('influxdb database already exists')
 
     def insertData(self, perf_data):
-        self.checkIndices()
+        print('influx: ' + str(perf_data))
         doc_type = perf_data['doc_type']
         del perf_data['doc_type']
         for unit_metric in perf_data:
-            result = self.es_conn.index(index=self.index_name, body=perf_data[
-                                        unit_metric], doc_type=doc_type)
-
-    def checkIndices(self):
-        d = date.today()
-        self.index_name = 'centreon-' + d.strftime("%Y.%m.%d")
-        if not self.es_conn.indices.exists(self.index_name):
-            print('no index, creating')
-            body = self.read_json(
-                "conf/elasticsearch_centreon_mappings.json")
-            try:
-                self.es_conn.indices.create(
-                    index=self.index_name, body=body)
-            except elasticsearch.RequestError as e:
-                # TODO: check different execptions to kill if needed
-                self.logger.exception(e)
-
-    def read_json(self, filename):
-        f_in = open(filename)
-        data = json.load(f_in)
-        f_in.close()
-        return data
+            json_perf = [
+                {
+                    "measurement": perf_data[unit_metric]['metric_name'],
+                    "tags": {
+                        "host_id": str(perf_data[unit_metric]['host_id']),
+                        "service_id": str(perf_data[unit_metric]['service_id']),
+                        "unit": perf_data[unit_metric]['unit']
+                    },
+                    "time": perf_data[unit_metric]['@timestamp'],
+                    "fields": {
+                        "value": float(perf_data[unit_metric]['value'])
+                    }
+                }
+            ]
+            self.logger.debug('writing to influxdb: ' + str(json_perf))
+            self.influx_conn.write_points(json_perf, time_precision='s')

@@ -126,14 +126,24 @@ class Work():
         # Port 0 means to select an arbitrary unused port
         HOST, PORT = self.options["listen_ip"], self.options["listen_port"]
 
-        server = ThreadedTCPServer((HOST, PORT), ThreadedTCPRequestHandler, self.logger, self.options, self.output)
+        binded = 0
+        while not binded:
+            try:
+                server = ThreadedTCPServer((HOST, PORT), ThreadedTCPRequestHandler, self.logger, self.options, self.output)
+                binded = 1
+            except socket.error as e:
+                self.logger.warning("can't bind to socket; waiting")
+                time.sleep(self.options['wait_socket'])
+
         ip, port = server.server_address
 
         # Start a thread with the server -- that thread will then start one
         # more thread for each request
+
         server_thread = threading.Thread(target=server.serve_forever)
         # Exit the server thread when the main thread terminates
         server_thread.daemon = True
         server_thread.start()
-        print "Server loop running in thread:", server_thread.name
+
+        self.logger.debug("Server loop running in thread: " + str(server_thread.name))
         #

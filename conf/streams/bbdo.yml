@@ -1,17 +1,17 @@
 ---
 active: yes
 inputs:
-    active: yes
-    name: bbdo
-    workers: 1
-    links:
-        out: yes
-        in: no
-    options:
-        wait_socket: 10
-        version: 2
-        listen_ip: "localhost"
-        listen_port: 50007
+  active: yes
+  name: bbdo
+  workers: 1
+  links:
+    out: yes
+    in: no
+  options:
+    wait_socket: 10
+    version: 2
+    listen_ip: "localhost"
+    listen_port: 50007
 
 caches:
   active: no
@@ -22,22 +22,22 @@ caches:
   #       in: inputs_filters
 
 filters:
-    active: yes
-    name: bbdo
-    workers: 5
-    links:
-        in: yes
-        out: yes
-    options:
-        version: 2
+  active: yes
+  name: bbdo
+  workers: 5
+  links:
+    in: yes
+    out: yes
+  options:
+    version: 2
 
 outputs:
-    active: yes
-    name: bbdo
-    workers: 5
-    links:
-        in: yes
-        out: no
-    options:
-      elastic_host: "192.168.122.1"
-      elastic_port: 9200
+  active: yes
+  name: bbdo
+  workers: 5
+  links:
+    in: yes
+    out: no
+  options:
+    elastic_host: "192.168.122.1"
+    elastic_port: 9200

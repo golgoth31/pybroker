@@ -157,7 +157,8 @@ class Work():
                 float(data['check_interval'])) * 60
             perf_data[i]['service_id'] = data['service_id']
             try:
-                perf_data[i]['metric_name'], metric_data = metric.split("=")
+                metric_name, metric_data = metric.split("=")
+                perf_data[i]['metric_name'] = metric_name.strip("'\"")
                 while len(metric_data.split(";")) < 5:
                     metric_data = metric_data + ';'
                 metric_value_full, perf_data[i]['warn'], perf_data[i]['crit'], perf_data[
