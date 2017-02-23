@@ -156,6 +156,7 @@ class Work():
             perf_data[i]['check_interval'] = round(
                 float(data['check_interval'])) * 60
             perf_data[i]['service_id'] = data['service_id']
+            perf_data[i]['current_state'] = data['current_state']
             try:
                 metric_name, metric_data = metric.split("=")
                 perf_data[i]['metric_name'] = metric_name.strip("'\"")
