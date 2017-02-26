@@ -149,26 +149,29 @@ class Work():
         metrics = data['perf_data'].split(" ")
         i = 0
         perf_data['doc_type'] = 'metrics'
+        perf_data['info'] = {}
+        perf_data['info']['host_id'] = data['host_id']
+        perf_data['info']['@timestamp'] = data['last_check']
+        perf_data['info']['check_interval'] = round(
+            float(data['check_interval'])) * 60
+        perf_data['info']['service_id'] = data['service_id']
+        perf_data['info']['current_state'] = data['current_state']
+        perf_data['metrics'] = []
         for metric in metrics:
-            perf_data[i] = {}
-            perf_data[i]['host_id'] = data['host_id']
-            perf_data[i]['@timestamp'] = data['last_check']
-            perf_data[i]['check_interval'] = round(
-                float(data['check_interval'])) * 60
-            perf_data[i]['service_id'] = data['service_id']
-            perf_data[i]['current_state'] = data['current_state']
+            local_metric = {}
             try:
                 metric_name, metric_data = metric.split("=")
-                perf_data[i]['metric_name'] = metric_name.strip("'\"")
+                local_metric['metric_name'] = metric_name.strip("'\"")
                 while len(metric_data.split(";")) < 5:
                     metric_data = metric_data + ';'
-                metric_value_full, perf_data[i]['warn'], perf_data[i]['crit'], perf_data[
-                    i]['min'], perf_data[i]['max'] = metric_data.split(";")
+                metric_value_full, local_metric['warn'], local_metric['crit'], local_metric['min'], local_metric['max'] = metric_data.split(";")
                 val = self.perf_data_regexp.match(metric_value_full)
-                perf_data[i]['value'] = val.group(1)
-                perf_data[i]['unit'] = val.group(2)
+                local_metric['value'] = val.group(1)
+                local_metric['unit'] = val.group(2)
+                perf_data['metrics'].append(local_metric)
             except ValueError:
-                perf_data.pop(i)
+                # perf_data['metrics'].pop(i)
+                pass
             # print(perf_data)
             i += 1
         return perf_data
