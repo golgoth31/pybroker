@@ -34,17 +34,37 @@ class Es():
             'elasticsearch')
         self.logger.setLevel(logging.DEBUG)
         try:
-            self.es_conn = elasticsearch.Elasticsearch([{'host': elastic_host}, ])
+            self.es_conn = elasticsearch.Elasticsearch(
+                [{'host': elastic_host}, ])
         except:
             self.logger.exception("can't connect to: " + elastic_host)
 
     def insertData(self, perf_data):
         self.checkIndices()
-        doc_type = perf_data['doc_type']
-        del perf_data['doc_type']
-        for unit_metric in perf_data:
-            result = self.es_conn.index(index=self.index_name, body=perf_data[
-                                        unit_metric], doc_type=doc_type)
+        # doc_type = perf_data['doc_type']
+        # del perf_data['doc_type']
+        print(perf_data)
+        if perf_data['doc_type'] == 'metrics':
+            for unit_metric in perf_data['metrics']:
+                metric = {}
+                metric['host_id'] = perf_data['info']['host_id']
+                metric['@timestamp'] = perf_data['info']['@timestamp']
+                metric['check_interval'] = perf_data['info']['check_interval']
+                metric['service_id'] = perf_data['info']['service_id']
+                metric['service_description'] = perf_data['info']['service_description']
+                metric['state'] = perf_data['info']['current_state']
+
+                metric['metric_name'] = unit_metric['metric_name']
+                metric['warn'] = unit_metric['warn']
+                metric['crit'] = unit_metric['crit']
+                metric['min'] = unit_metric['min']
+                metric['max'] = unit_metric['max']
+                metric['value'] = unit_metric['value']
+                metric['unit'] = unit_metric['unit']
+                result = self.es_conn.index(
+                    index=self.index_name,
+                    body=metric,
+                    doc_type=perf_data['doc_type'])
 
     def checkIndices(self):
         d = date.today()

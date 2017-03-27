@@ -12,9 +12,7 @@
                     "match": "*",
                     "match_mapping_type": "string",
                     "mapping": {
-                        "type": "string",
-                        "doc_values": true,
-                        "index": "not_analyzed"
+                        "type": "keyword"
                     }
                 }
             }],
@@ -38,19 +36,16 @@
                     "doc_values": true
                 },
                 "host_name": {
-                    "type": "string",
-                    "index": "not_analyzed"
+                    "type": "keyword"
                 },
                 "service_description": {
-                    "type": "string",
-                    "index": "not_analyzed"
+                    "type": "keyword"
                 },
                 "current_state": {
-                    "type": "integer",
-                    "doc_values": true
+                    "type": "integer"
                 },
                 "current_state_literal": {
-                    "type": "string"
+                    "type": "keyword"
                 }
             }
         },
@@ -60,9 +55,7 @@
                     "match": "*",
                     "match_mapping_type": "string",
                     "mapping": {
-                        "type": "string",
-                        "doc_values": true,
-                        "index": "not_analyzed"
+                        "type": "keyword"
                     }
                 }
             }],
@@ -78,19 +71,16 @@
                     "format": "epoch_second"
                 },
                 "host_id": {
-                    "type": "integer",
-                    "doc_values": true
+                    "type": "integer"
                 },
                 "host_name": {
-                    "type": "string",
-                    "index": "not_analyzed"
+                    "type": "keyword"
                 },
                 "current_state": {
-                    "type": "integer",
-                    "doc_values": true
+                    "type": "integer"
                 },
                 "current_state_literal": {
-                    "type": "string"
+                    "type": "keyword"
                 }
             }
         },
@@ -100,9 +90,7 @@
                     "match": "*",
                     "match_mapping_type": "string",
                     "mapping": {
-                        "type": "string",
-                        "doc_values": true,
-                        "index": "not_analyzed"
+                        "type": "keyword"
                     }
                 }
             }],
@@ -118,52 +106,48 @@
                     "format": "epoch_second"
                 },
                 "output": {
-                    "type": "string",
-                    "doc_values": false,
-                    "index": "no"
+                    "type": "text",
+                    "index": false
                 },
                 "host_id": {
-                    "type": "integer",
-                    "doc_values": true
+                    "type": "integer"
                 },
                 "service_id": {
-                    "type": "integer",
-                    "doc_values": true
+                    "type": "integer"
+                },
+                "service_description": {
+                    "type": "keyword"
                 },
                 "metric_name": {
-                    "type": "string",
-                    "index": "not_analyzed"
+                    "type": "keyword"
                 },
                 "unit": {
-                    "type": "string"
+                    "type": "keyword"
                 },
                 "max": {
                     "type": "float",
-                    "doc_values": true,
-                    "index": "no"
+                    "index": false
                 },
                 "min": {
                     "type": "float",
-                    "doc_values": true,
-                    "index": "no"
+                    "index": false
                 },
                 "value": {
-                    "type": "float",
-                    "doc_values": true
+                    "type": "float"
+                },
+                "state": {
+                    "type": "integer"
                 },
                 "check_interval": {
-                    "type": "float",
-                    "doc_values": true
+                    "type": "float"
                 },
                 "warn": {
-                    "type": "string",
-                    "doc_values": true,
-                    "index": "no"
+                    "type": "keyword",
+                    "index": false
                 },
                 "crit": {
-                    "type": "string",
-                    "doc_values": true,
-                    "index": "no"
+                    "type": "keyword",
+                    "index": false
                 }
             }
         }

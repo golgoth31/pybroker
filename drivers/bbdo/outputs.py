@@ -27,7 +27,7 @@ import importlib
 
 # project imports
 from drivers.es import *
-from drivers.influx import *
+# from drivers.influx import *
 
 READY = "r"
 ERROR = "e"
@@ -45,7 +45,7 @@ class Work():
         self.begin = 0
         self.elastic = Es(
             self.options["elastic_host"], self.options["elastic_port"])
-        self.inf = Influx(self.options["elastic_host"], self.options["elastic_port"])
+        # self.inf = Influx(self.options["elastic_host"], self.options["elastic_port"])
 
     def run(self):
 
@@ -56,11 +56,12 @@ class Work():
             if not msg:
                 break
             self.logger.debug("sending to database: " + str(msg))
-            if msg['doc_type'] != 'metrics':
-                sent_msg = self.elastic.insertData(msg)
-            else:
-                self.logger.debug("sending to influxdb database")
-                sent_msg = self.inf.insertData(msg)
+            sent_msg = self.elastic.insertData(msg)
+            # if msg['doc_type'] != 'metrics':
+            #     sent_msg = self.elastic.insertData(msg)
+            # else:
+            #     self.logger.debug("sending to influxdb database")
+            #     sent_msg = self.inf.insertData(msg)
 
         self.worker.close()
         self.context.term()

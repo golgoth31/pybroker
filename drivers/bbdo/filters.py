@@ -156,6 +156,7 @@ class Work():
             float(data['check_interval'])) * 60
         perf_data['info']['service_id'] = data['service_id']
         perf_data['info']['current_state'] = data['current_state']
+        perf_data['info']['service_description'] = data['service_description']
         perf_data['metrics'] = []
         for metric in metrics:
             local_metric = {}
