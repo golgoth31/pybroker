@@ -6,7 +6,7 @@
         }
     },
     "mappings": {
-        "servce_status": {
+        "service_status": {
             "dynamic_templates": [{
                 "strings": {
                     "match": "*",
